@@ -96,14 +96,14 @@ class ZaloAPI {
                 result(nil)
                 return
             }
-            let name = response?.data["name"] as? String
-            let id = response?.data["id"] as? String
+            let name = response?.data["name"] as? String ?? ""
+            let id = response?.data["id"] as? String ?? ""
             let picture = response?.data["picture"] as? [String: Any?]
             var url = ""
             if let picture = picture, let pictureData = picture["data"] as? [String: Any], let sUrl = pictureData["url"] as? String {
                 url = sUrl
             }
-            let profile = [
+            let profile: [String: String] = [
                 "id": id,
                 "name": name,
                 "pictureUrl": url
