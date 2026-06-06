@@ -202,7 +202,7 @@ class ZaloAPI {
 
     fun logout(): Boolean {
         try {
-            AppStorage.getInstance(context).clear()
+            AppStorage.getInstance(context).clearZaloData()
             ZaloSDK.Instance.unauthenticate()
             mUserData = UserData()
             return true
