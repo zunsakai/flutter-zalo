@@ -37,6 +37,7 @@ class FlutterZaloPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
+        zaloAPI?.cleanup()  // Shutdown executor properly
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {

@@ -4,6 +4,9 @@ import android.app.Activity
 import android.content.Context
 import android.text.TextUtils
 import android.util.Log
+import android.os.Handler
+import android.os.Looper
+import java.util.concurrent.Executors
 import com.zing.zalo.zalosdk.ZaloOAuthResultCode
 import com.zing.zalo.zalosdk.oauth.LoginVia
 import com.zing.zalo.zalosdk.oauth.OAuthCompleteListener
@@ -20,6 +23,8 @@ class ZaloAPI {
     private val LOG_TAG = ZaloAPI::class.java.simpleName
     private var mUserData: UserData? = null
     private lateinit var context: Context
+    private val executor = Executors.newSingleThreadExecutor()
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     fun setContext(context: Context) {
         this.context = context
@@ -42,20 +47,34 @@ class ZaloAPI {
 
                 override fun onGetOAuthComplete(response: OauthResponse) {
                     super.onGetOAuthComplete(response)
-                    ZaloSDK.Instance.getAccessTokenByOAuthCode(
-                        context, response.oauthCode, Utilities.code_verifier,
-                        ZaloOpenAPICallback { data ->
-                            val err = data.optInt("extCode", ZaloOAuthResultCode.ERR_UNKNOWN_ERROR)
-                            if (err != 0) {
-                                val msg = data.optString("errorMsg", "")
-                                Log.e(LOG_TAG, "Login failed: $msg")
+                    // Execute the SDK call on a background thread
+                    executor.execute {
+                        try {
+                            ZaloSDK.Instance.getAccessTokenByOAuthCode(
+                                context, response.oauthCode, Utilities.code_verifier,
+                                ZaloOpenAPICallback { data ->
+                                    // Post the result back to main thread
+                                    mainHandler.post {
+                                        val err = data.optInt("extCode", ZaloOAuthResultCode.ERR_UNKNOWN_ERROR)
+                                        if (err != 0) {
+                                            val msg = data.optString("errorMsg", "")
+                                            Log.e(LOG_TAG, "Login failed: $msg")
+                                            result.success(false)
+                                        } else {
+                                            saveTokenData(data)
+                                            result.success(true)
+                                        }
+                                    }
+                                }
+                            )
+                        } catch (e: Exception) {
+                            Log.e(LOG_TAG, "Error in getAccessTokenByOAuthCode: ${e.message}")
+                            // Post error result back to main thread
+                            mainHandler.post {
                                 result.success(false)
-                            } else {
-                                saveTokenData(data)
-                                result.success(true)
                             }
                         }
-                    )
+                    }
                 }
             }
         )
@@ -110,21 +129,35 @@ class ZaloAPI {
                 result.success(false)
                 return
             }
-            ZaloSDK.Instance.getAccessTokenByRefreshToken(
-                context,
-                AppStorage.getInstance(context).getRefreshToken(),
-                ZaloOpenAPICallback { data ->
-                    val err = data.optInt("extCode", ZaloOAuthResultCode.ERR_UNKNOWN_ERROR)
-                    if (err != 0) {
-                        val msg = data.optString("errorMsg", "")
-                        Log.e(LOG_TAG, "Login failed: $msg")
+            // Execute the SDK call on a background thread
+            executor.execute {
+                try {
+                    ZaloSDK.Instance.getAccessTokenByRefreshToken(
+                        context,
+                        AppStorage.getInstance(context).getRefreshToken(),
+                        ZaloOpenAPICallback { data ->
+                            // Post the result back to main thread
+                            mainHandler.post {
+                                val err = data.optInt("extCode", ZaloOAuthResultCode.ERR_UNKNOWN_ERROR)
+                                if (err != 0) {
+                                    val msg = data.optString("errorMsg", "")
+                                    Log.e(LOG_TAG, "Refresh token failed: $msg")
+                                    result.success(false)
+                                } else {
+                                    saveTokenData(data)
+                                    result.success(true)
+                                }
+                            }
+                        }
+                    )
+                } catch (e: Exception) {
+                    Log.e(LOG_TAG, "Error in getAccessTokenByRefreshToken: ${e.message}")
+                    // Post error result back to main thread
+                    mainHandler.post {
                         result.success(false)
-                    } else {
-                        saveTokenData(data)
-                        result.success(true)
                     }
                 }
-            )
+            }
         } catch (_: Exception) {
             result.success(false)
         }
@@ -137,20 +170,34 @@ class ZaloAPI {
             callback(null)
             return
         }
-        val fields =
-            arrayOf("id", "picture.type(large)", "name")
-        ZaloSDK.Instance.getProfile(
-            context, accessToken,
-            { data ->
-                if (data == null) {
+        
+        // Execute the SDK call on a background thread
+        executor.execute {
+            try {
+                val fields = arrayOf("id", "picture.type(large)", "name")
+                ZaloSDK.Instance.getProfile(
+                    context, accessToken,
+                    { data ->
+                        // Post the result back to main thread
+                        mainHandler.post {
+                            if (data == null) {
+                                callback(null)
+                            } else {
+                                mUserData = UserData()
+                                mUserData?.fromJson(data)
+                                callback(mUserData!!)
+                            }
+                        }
+                    }, fields
+                )
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "Error in getProfile: ${e.message}")
+                // Post error result back to main thread
+                mainHandler.post {
                     callback(null)
-                } else {
-                    mUserData = UserData()
-                    mUserData?.fromJson(data)
-                    callback(mUserData!!)
                 }
-            }, fields
-        )
+            }
+        }
     }
 
     fun logout(): Boolean {
@@ -161,6 +208,14 @@ class ZaloAPI {
             return true
         } catch (_: Exception) {
             return false
+        }
+    }
+
+    fun cleanup() {
+        try {
+            executor.shutdown()
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Error shutting down executor: ${e.message}")
         }
     }
 }
