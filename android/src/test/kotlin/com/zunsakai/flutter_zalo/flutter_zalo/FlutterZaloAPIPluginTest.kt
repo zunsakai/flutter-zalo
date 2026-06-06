@@ -1,9 +1,9 @@
 package com.zunsakai.flutter_zalo.flutter_zalo
 
-import io.flutter.plugin.common.MethodCall
-import io.flutter.plugin.common.MethodChannel
+import com.zunsakai.flutter_zalo.flutter_zalo.data.UserData
+import kotlin.test.assertEquals
 import kotlin.test.Test
-import org.mockito.Mockito
+import org.json.JSONObject
 
 /*
  * This demonstrates a simple unit test of the Kotlin portion of this plugin's implementation.
@@ -15,13 +15,13 @@ import org.mockito.Mockito
 
 internal class FlutterZaloAPIPluginTest {
   @Test
-  fun onMethodCall_getPlatformVersion_returnsExpectedValue() {
-    val plugin = FlutterZaloPlugin()
+  fun userData_fromJson_handlesMissingPicture() {
+    val userData = UserData()
 
-    val call = MethodCall("getPlatformVersion", null)
-    val mockResult: MethodChannel.Result = Mockito.mock(MethodChannel.Result::class.java)
-    plugin.onMethodCall(call, mockResult)
+    userData.fromJson(JSONObject("""{"id":"123","name":"Zalo User"}"""))
 
-    Mockito.verify(mockResult).success("Android " + android.os.Build.VERSION.RELEASE)
+    assertEquals("123", userData.getId())
+    assertEquals("Zalo User", userData.getName())
+    assertEquals("", userData.getPictureUrl())
   }
 }
