@@ -20,8 +20,11 @@ class UserData {
     }
 
     fun fromJson(json: JSONObject) {
-        id = json.getString("id")
-        name = json.getString("name")
-        pictureUrl = json.getJSONObject("picture").getJSONObject("data").getString("url")
+        id = json.optString("id")
+        name = json.optString("name")
+        pictureUrl = json.optJSONObject("picture")
+            ?.optJSONObject("data")
+            ?.optString("url")
+            ?: ""
     }
 }
