@@ -44,15 +44,15 @@ class ZaloAPI {
                 result(false)
                 return
             }
-            self.saveTokenData(tokenResponse)
-            result(true)
+            result(self.saveTokenData(tokenResponse))
         }
     }
     
-    func saveTokenData(_ tokenResponse: ZOTokenResponseObject?) {
-        AppStorage.shared.saveToKeychain(forKey: UserDefaultsKeys.accessToken.rawValue, value: tokenResponse?.accessToken ?? "")
-        AppStorage.shared.saveToKeychain(forKey: UserDefaultsKeys.refreshToken.rawValue, value: tokenResponse?.refreshToken ?? "")
-        AppStorage.shared.saveToKeychain(forKey: UserDefaultsKeys.expriedTime.rawValue, value: tokenResponse?.expriedTime != nil ? String(tokenResponse!.expriedTime) : "")
+    func saveTokenData(_ tokenResponse: ZOTokenResponseObject?) -> Bool {
+        let accessTokenSaved = AppStorage.shared.saveToKeychain(forKey: UserDefaultsKeys.accessToken.rawValue, value: tokenResponse?.accessToken ?? "")
+        let refreshTokenSaved = AppStorage.shared.saveToKeychain(forKey: UserDefaultsKeys.refreshToken.rawValue, value: tokenResponse?.refreshToken ?? "")
+        let expriedTimeSaved = AppStorage.shared.saveToKeychain(forKey: UserDefaultsKeys.expriedTime.rawValue, value: tokenResponse?.expriedTime != nil ? String(tokenResponse!.expriedTime) : "")
+        return accessTokenSaved && refreshTokenSaved && expriedTimeSaved
     }
     
     func isAccessTokenValid() -> Bool {
@@ -76,8 +76,7 @@ class ZaloAPI {
                 result(false)
                 return
             }
-            self.saveTokenData(response)
-            result(true)
+            result(self.saveTokenData(response))
         }
     }
     
