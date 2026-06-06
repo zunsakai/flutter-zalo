@@ -8,7 +8,15 @@ class ZaloAPI {
     static let shared = ZaloAPI()
     
     func initialize(result: @escaping FlutterResult) {
-        let zaloAppID = Bundle.main.object(forInfoDictionaryKey: "ZaloAppID") as? String
+        guard let zaloAppID = Bundle.main.object(forInfoDictionaryKey: "ZaloAppID") as? String,
+              !zaloAppID.isEmpty else {
+            result(FlutterError(
+                code: "missing_zalo_app_id",
+                message: "ZaloAppID is missing from Info.plist",
+                details: nil
+            ))
+            return
+        }
         ZaloSDK.sharedInstance()?.initialize(withAppId: zaloAppID)
         result(nil)
     }
