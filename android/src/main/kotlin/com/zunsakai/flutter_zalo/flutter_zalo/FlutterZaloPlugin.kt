@@ -45,6 +45,7 @@ class FlutterZaloPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     override fun onDetachedFromActivityForConfigChanges() {
+        activity = null
     }
 
     override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
@@ -52,6 +53,7 @@ class FlutterZaloPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     override fun onDetachedFromActivity() {
+        activity = null
     }
 
     override fun onMethodCall(call: MethodCall, result: Result) {
