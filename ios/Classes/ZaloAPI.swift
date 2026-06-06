@@ -70,7 +70,11 @@ class ZaloAPI {
     }
     
     func refreshAccessToken(result: @escaping FlutterResult) {
-        let refreshToken = AppStorage.shared.getFromKeychain(forKey: UserDefaultsKeys.refreshToken.rawValue)
+        guard let refreshToken = AppStorage.shared.getFromKeychain(forKey: UserDefaultsKeys.refreshToken.rawValue),
+              !refreshToken.isEmpty else {
+            result(false)
+            return
+        }
         ZaloSDK.sharedInstance().getAccessToken(withRefreshToken: refreshToken) { (response) in
             if response?.errorCode != 0 {
                 result(false)
