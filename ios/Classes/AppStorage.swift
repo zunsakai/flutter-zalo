@@ -1,20 +1,33 @@
+import Foundation
+import Security
+
 class AppStorage {
     static let shared = AppStorage()
+    private let service = "\(Bundle.main.bundleIdentifier ?? "flutter_zalo").flutter_zalo"
 
-    func saveToKeychain(forKey key: String, value: String) {
+    func saveToKeychain(forKey key: String, value: String) -> Bool {
         let data = value.data(using: .utf8)!
-        let query: [String: Any] = [
+        let baseQuery: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: key
+        ]
+        SecItemDelete(baseQuery as CFDictionary)
+
+        let addQuery: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
             kSecAttrAccount as String: key,
             kSecValueData as String: data
         ]
-        SecItemDelete(query as CFDictionary) // Delete any existing item
-        SecItemAdd(query as CFDictionary, nil)
+        let status = SecItemAdd(addQuery as CFDictionary, nil)
+        return status == errSecSuccess
     }
 
     func deleteFromKeychain(forKey key: String) {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
             kSecAttrAccount as String: key
         ]
         SecItemDelete(query as CFDictionary)
@@ -23,6 +36,7 @@ class AppStorage {
     func getFromKeychain(forKey key: String) -> String? {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
             kSecAttrAccount as String: key,
             kSecReturnData as String: kCFBooleanTrue!,
             kSecMatchLimit as String: kSecMatchLimitOne

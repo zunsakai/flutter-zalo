@@ -7,9 +7,9 @@ import androidx.preference.PreferenceManager
 open class Storage (context: Context){
     private var localPref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-    fun clear() {
+    protected fun clearKeys(vararg keys: String) {
         val edit = localPref.edit()
-        edit.clear()
+        keys.forEach { key -> edit.remove(key) }
         edit.apply()
     }
 

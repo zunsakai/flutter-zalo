@@ -61,8 +61,7 @@ class ZaloAPI {
                                             Log.e(LOG_TAG, "Login failed: $msg")
                                             result.success(false)
                                         } else {
-                                            saveTokenData(data)
-                                            result.success(true)
+                                            result.success(saveTokenData(data))
                                         }
                                     }
                                 }
@@ -80,7 +79,7 @@ class ZaloAPI {
         )
     }
 
-    private fun saveTokenData(data: JSONObject) {
+    private fun saveTokenData(data: JSONObject): Boolean {
         try {
             val accessToken = data.optString("access_token")
             val expiresIn = data.optString("expires_in").toLong()
@@ -89,7 +88,7 @@ class ZaloAPI {
 
             if (TextUtils.isEmpty(accessToken)) {
                 Log.e(LOG_TAG, "Access token is empty")
-                return
+                return false
             }
 
             val timeExpire = System.currentTimeMillis() + expiresIn * 1000
@@ -101,8 +100,10 @@ class ZaloAPI {
             AppStorage.getInstance(context).setRefreshTokenExpiresIn(timeRefreshExpire)
 
             Log.d(LOG_TAG, "Login successfull!")
+            return true
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Error while saving token data: ${e.message}")
+            return false
         }
     }
 
@@ -144,8 +145,7 @@ class ZaloAPI {
                                     Log.e(LOG_TAG, "Refresh token failed: $msg")
                                     result.success(false)
                                 } else {
-                                    saveTokenData(data)
-                                    result.success(true)
+                                    result.success(saveTokenData(data))
                                 }
                             }
                         }
@@ -170,7 +170,7 @@ class ZaloAPI {
             callback(null)
             return
         }
-        
+
         // Execute the SDK call on a background thread
         executor.execute {
             try {
@@ -202,7 +202,7 @@ class ZaloAPI {
 
     fun logout(): Boolean {
         try {
-            AppStorage.getInstance(context).clear()
+            AppStorage.getInstance(context).clearZaloData()
             ZaloSDK.Instance.unauthenticate()
             mUserData = UserData()
             return true
