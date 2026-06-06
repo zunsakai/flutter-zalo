@@ -2,6 +2,7 @@ import Foundation
 import ZaloSDK
 import Flutter
 import Security
+import UIKit
 
 class ZaloAPI {
     static let shared = ZaloAPI()
@@ -16,15 +17,17 @@ class ZaloAPI {
         logout()
         Utilities.shared.genNewCode()
         ZaloSDK.sharedInstance()?.unauthenticate()
-        if let rootViewController = UIApplication.shared.delegate?.window??.rootViewController {
-            ZaloSDK.sharedInstance()?.authenticateZalo(
-                with: ZAZAloSDKAuthenTypeViaZaloAppAndWebView,
-                parentController: rootViewController,
-                codeChallenge: Utilities.shared.code_challenge,
-                extInfo: Constant.EXT_INFO
-            ) { (response) in
-                self.authenticateListener(result: result, with: response)
-            }
+        guard let rootViewController = getRootViewController() else {
+            result(false)
+            return
+        }
+        ZaloSDK.sharedInstance()?.authenticateZalo(
+            with: ZAZAloSDKAuthenTypeViaZaloAppAndWebView,
+            parentController: rootViewController,
+            codeChallenge: Utilities.shared.code_challenge,
+            extInfo: Constant.EXT_INFO
+        ) { (response) in
+            self.authenticateListener(result: result, with: response)
         }
     }
     
@@ -111,5 +114,16 @@ class ZaloAPI {
         AppStorage.shared.deleteFromKeychain(forKey: UserDefaultsKeys.refreshToken.rawValue)
         AppStorage.shared.deleteFromKeychain(forKey: UserDefaultsKeys.expriedTime.rawValue)
         ZaloSDK.sharedInstance()?.unauthenticate()
+    }
+
+    private func getRootViewController() -> UIViewController? {
+        if let rootViewController = UIApplication.shared.delegate?.window??.rootViewController {
+            return rootViewController
+        }
+        return UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .first { $0.isKeyWindow }?
+            .rootViewController
     }
 }
