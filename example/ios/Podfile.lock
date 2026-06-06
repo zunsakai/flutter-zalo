@@ -3,8 +3,6 @@ PODS:
   - flutter_zalo (0.0.1):
     - Flutter
     - ZaloSDK
-  - integration_test (0.0.1):
-    - Flutter
   - ZaloSDK (4.1.0120):
     - ZaloSDK/Core (= 4.1.0120)
     - ZaloSDK/Main (= 4.1.0120)
@@ -15,7 +13,6 @@ PODS:
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_zalo (from `.symlinks/plugins/flutter_zalo/ios`)
-  - integration_test (from `.symlinks/plugins/integration_test/ios`)
 
 SPEC REPOS:
   trunk:
@@ -26,15 +23,12 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_zalo:
     :path: ".symlinks/plugins/flutter_zalo/ios"
-  integration_test:
-    :path: ".symlinks/plugins/integration_test/ios"
 
 SPEC CHECKSUMS:
-  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  flutter_zalo: d4adb9ce28081f14e11c2ed51cf965f55448f4e2
-  integration_test: 252f60fa39af5e17c3aa9899d35d908a0721b573
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  flutter_zalo: 247e81cf45179322d1b4b88bc40fb6c7cdcb5f5f
   ZaloSDK: 233c5cb5247bd6891f4a7d2d9505f6a2b9aa38c6
 
-PODFILE CHECKSUM: 819463e6a0290f5a72f145ba7cde16e8b6ef0796
+PODFILE CHECKSUM: ade96bceabe3919b69c16573938e4268fe3a6c9d
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2

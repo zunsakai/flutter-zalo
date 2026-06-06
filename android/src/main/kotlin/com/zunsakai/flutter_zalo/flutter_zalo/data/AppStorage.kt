@@ -48,4 +48,13 @@ class AppStorage(context: Context) : Storage(context) {
     fun setRefreshTokenExpiresIn(expiresIn: Long) {
         setLong(APP_REFRESH_TOKEN_EXPIRES_IN, expiresIn)
     }
+
+    fun clearZaloData() {
+        clearKeys(
+            APP_ACCESS_TOKEN,
+            APP_EXPIRES_IN,
+            APP_REFRESH_TOKEN,
+            APP_REFRESH_TOKEN_EXPIRES_IN
+        )
+    }
 }

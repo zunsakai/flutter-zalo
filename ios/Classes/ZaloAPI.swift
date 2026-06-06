@@ -2,12 +2,21 @@ import Foundation
 import ZaloSDK
 import Flutter
 import Security
+import UIKit
 
 class ZaloAPI {
     static let shared = ZaloAPI()
     
     func initialize(result: @escaping FlutterResult) {
-        let zaloAppID = Bundle.main.object(forInfoDictionaryKey: "ZaloAppID") as? String
+        guard let zaloAppID = Bundle.main.object(forInfoDictionaryKey: "ZaloAppID") as? String,
+              !zaloAppID.isEmpty else {
+            result(FlutterError(
+                code: "missing_zalo_app_id",
+                message: "ZaloAppID is missing from Info.plist",
+                details: nil
+            ))
+            return
+        }
         ZaloSDK.sharedInstance()?.initialize(withAppId: zaloAppID)
         result(nil)
     }
@@ -16,15 +25,17 @@ class ZaloAPI {
         logout()
         Utilities.shared.genNewCode()
         ZaloSDK.sharedInstance()?.unauthenticate()
-        if let rootViewController = UIApplication.shared.delegate?.window??.rootViewController {
-            ZaloSDK.sharedInstance()?.authenticateZalo(
-                with: ZAZAloSDKAuthenTypeViaZaloAppAndWebView,
-                parentController: rootViewController,
-                codeChallenge: Utilities.shared.code_challenge,
-                extInfo: Constant.EXT_INFO
-            ) { (response) in
-                self.authenticateListener(result: result, with: response)
-            }
+        guard let rootViewController = getRootViewController() else {
+            result(false)
+            return
+        }
+        ZaloSDK.sharedInstance()?.authenticateZalo(
+            with: ZAZAloSDKAuthenTypeViaZaloAppAndWebView,
+            parentController: rootViewController,
+            codeChallenge: Utilities.shared.code_challenge,
+            extInfo: Constant.EXT_INFO
+        ) { (response) in
+            self.authenticateListener(result: result, with: response)
         }
     }
     
@@ -41,15 +52,15 @@ class ZaloAPI {
                 result(false)
                 return
             }
-            self.saveTokenData(tokenResponse)
-            result(true)
+            result(self.saveTokenData(tokenResponse))
         }
     }
     
-    func saveTokenData(_ tokenResponse: ZOTokenResponseObject?) {
-        AppStorage.shared.saveToKeychain(forKey: UserDefaultsKeys.accessToken.rawValue, value: tokenResponse?.accessToken ?? "")
-        AppStorage.shared.saveToKeychain(forKey: UserDefaultsKeys.refreshToken.rawValue, value: tokenResponse?.refreshToken ?? "")
-        AppStorage.shared.saveToKeychain(forKey: UserDefaultsKeys.expriedTime.rawValue, value: tokenResponse?.expriedTime != nil ? String(tokenResponse!.expriedTime) : "")
+    func saveTokenData(_ tokenResponse: ZOTokenResponseObject?) -> Bool {
+        let accessTokenSaved = AppStorage.shared.saveToKeychain(forKey: UserDefaultsKeys.accessToken.rawValue, value: tokenResponse?.accessToken ?? "")
+        let refreshTokenSaved = AppStorage.shared.saveToKeychain(forKey: UserDefaultsKeys.refreshToken.rawValue, value: tokenResponse?.refreshToken ?? "")
+        let expriedTimeSaved = AppStorage.shared.saveToKeychain(forKey: UserDefaultsKeys.expriedTime.rawValue, value: tokenResponse?.expriedTime != nil ? String(tokenResponse!.expriedTime) : "")
+        return accessTokenSaved && refreshTokenSaved && expriedTimeSaved
     }
     
     func isAccessTokenValid() -> Bool {
@@ -67,14 +78,17 @@ class ZaloAPI {
     }
     
     func refreshAccessToken(result: @escaping FlutterResult) {
-        let refreshToken = AppStorage.shared.getFromKeychain(forKey: UserDefaultsKeys.refreshToken.rawValue)
+        guard let refreshToken = AppStorage.shared.getFromKeychain(forKey: UserDefaultsKeys.refreshToken.rawValue),
+              !refreshToken.isEmpty else {
+            result(false)
+            return
+        }
         ZaloSDK.sharedInstance().getAccessToken(withRefreshToken: refreshToken) { (response) in
             if response?.errorCode != 0 {
                 result(false)
                 return
             }
-            self.saveTokenData(response)
-            result(true)
+            result(self.saveTokenData(response))
         }
     }
     
@@ -90,14 +104,14 @@ class ZaloAPI {
                 result(nil)
                 return
             }
-            let name = response?.data["name"] as? String
-            let id = response?.data["id"] as? String
+            let name = response?.data["name"] as? String ?? ""
+            let id = response?.data["id"] as? String ?? ""
             let picture = response?.data["picture"] as? [String: Any?]
             var url = ""
             if let picture = picture, let pictureData = picture["data"] as? [String: Any], let sUrl = pictureData["url"] as? String {
                 url = sUrl
             }
-            let profile = [
+            let profile: [String: String] = [
                 "id": id,
                 "name": name,
                 "pictureUrl": url
@@ -111,5 +125,16 @@ class ZaloAPI {
         AppStorage.shared.deleteFromKeychain(forKey: UserDefaultsKeys.refreshToken.rawValue)
         AppStorage.shared.deleteFromKeychain(forKey: UserDefaultsKeys.expriedTime.rawValue)
         ZaloSDK.sharedInstance()?.unauthenticate()
+    }
+
+    private func getRootViewController() -> UIViewController? {
+        if let rootViewController = UIApplication.shared.delegate?.window??.rootViewController {
+            return rootViewController
+        }
+        return UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .first { $0.isKeyWindow }?
+            .rootViewController
     }
 }
