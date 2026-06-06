@@ -55,10 +55,6 @@ class FlutterZaloPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     override fun onMethodCall(call: MethodCall, result: Result) {
-        if (activity == null) {
-            result.error("Error", "Activity is null", null)
-            return
-        }
         val isDebuggable: Boolean =
             (this.context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
         this.result = result
@@ -84,8 +80,13 @@ class FlutterZaloPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             }
 
             "logIn" -> {
+                val currentActivity = activity
+                if (currentActivity == null) {
+                    result.error("Error", "Activity is null", null)
+                    return
+                }
                 try {
-                    zaloAPI?.logIn(result, activity!!)
+                    zaloAPI?.logIn(result, currentActivity)
                 } catch (e: Exception) {
                     result.success(false)
                 }
