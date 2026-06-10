@@ -1,6 +1,6 @@
 PODS:
   - Flutter (1.0.0)
-  - flutter_zalo (0.0.1):
+  - flutter_zalo (1.0.1):
     - Flutter
     - ZaloSDK
   - ZaloSDK (4.1.0120):
@@ -26,7 +26,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  flutter_zalo: 247e81cf45179322d1b4b88bc40fb6c7cdcb5f5f
+  flutter_zalo: 44b30c5366057ed434a2f805c21de21038de2a4d
   ZaloSDK: 233c5cb5247bd6891f4a7d2d9505f6a2b9aa38c6
 
 PODFILE CHECKSUM: ade96bceabe3919b69c16573938e4268fe3a6c9d

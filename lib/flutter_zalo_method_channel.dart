@@ -3,8 +3,11 @@ import 'package:flutter/services.dart';
 
 import 'flutter_zalo_platform_interface.dart';
 
-/// An implementation of [FlutterZaloPlatform] that uses method channels.
+/// An implementation of [FlutterZaloAPI] that uses method channels.
 class MethodChannelFlutterZalo extends FlutterZaloAPI {
+  /// Constructs a [MethodChannelFlutterZalo].
+  MethodChannelFlutterZalo();
+
   /// The method channel used to interact with the native platform.
   @visibleForTesting
   final methodChannel = const MethodChannel('flutter_zalo');

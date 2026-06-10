@@ -2,7 +2,7 @@ import Foundation
 
 class Constant {
     public static let EXT_INFO = [
-        "appVersion": "1.0.0",
+        "appVersion": "1.0.1",
     ]
 }
 
