@@ -2,6 +2,7 @@ package com.zunsakai.flutter_zalo.flutter_zalo
 
 import android.app.Activity
 import android.content.Context
+import android.content.pm.PackageManager
 import android.text.TextUtils
 import android.util.Log
 import android.os.Handler
@@ -34,9 +35,16 @@ class ZaloAPI {
         logout()
         Utilities.genNewCode()
 
+        val loginVia = if (isZaloAppInstalled()) {
+            LoginVia.APP_OR_WEB
+        } else {
+            Log.d(LOG_TAG, "Zalo app is not installed, falling back to WebView login")
+            LoginVia.WEB
+        }
+
         ZaloSDK.Instance.authenticateZaloWithAuthenType(
             activity,
-            LoginVia.APP_OR_WEB,
+            loginVia,
             Utilities.code_challenge,
             object : OAuthCompleteListener() {
                 override fun onAuthenError(response: ErrorResponse) {
@@ -77,6 +85,15 @@ class ZaloAPI {
                 }
             }
         )
+    }
+
+    private fun isZaloAppInstalled(): Boolean {
+        return try {
+            context.packageManager.getPackageInfo("com.zing.zalo", 0)
+            true
+        } catch (e: PackageManager.NameNotFoundException) {
+            false
+        }
     }
 
     private fun saveTokenData(data: JSONObject): Boolean {

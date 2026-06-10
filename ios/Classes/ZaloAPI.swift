@@ -29,14 +29,28 @@ class ZaloAPI {
             result(false)
             return
         }
+
+        let authenType: ZAZaloSDKAuthenType = isZaloAppInstalled()
+            ? ZAZAloSDKAuthenTypeViaZaloAppAndWebView
+            : ZAZaloSDKAuthenTypeViaWebViewOnly
+
+        if authenType == ZAZaloSDKAuthenTypeViaWebViewOnly {
+            print("[FlutterZalo] Zalo app is not installed, falling back to WebView login")
+        }
+
         ZaloSDK.sharedInstance()?.authenticateZalo(
-            with: ZAZAloSDKAuthenTypeViaZaloAppAndWebView,
+            with: authenType,
             parentController: rootViewController,
             codeChallenge: Utilities.shared.code_challenge,
             extInfo: Constant.EXT_INFO
         ) { (response) in
             self.authenticateListener(result: result, with: response)
         }
+    }
+
+    private func isZaloAppInstalled() -> Bool {
+        guard let url = URL(string: "zalosdk://") else { return false }
+        return UIApplication.shared.canOpenURL(url)
     }
     
     func authenticateListener(result: @escaping FlutterResult, with response: ZOOauthResponseObject?) {
