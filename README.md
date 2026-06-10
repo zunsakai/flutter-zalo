@@ -161,6 +161,20 @@ If you already have a `MainApplication.kt` file, you can add the following code 
 ZaloSDKApplication.wrap(this);
 ```
 
+### 2.2.5 Modify build.gradle
+Open `android/build.gradle` and add the Zalo repository.
+
+```groovy
+allprojects {
+    repositories {
+        ...
+        maven {
+            url "https://gitlab.com/api/v4/projects/50747855/packages/maven"
+        }
+    }
+}
+```
+
 ## 2.3 Setup for iOS
 
 To make this plugin working we need to have there key:

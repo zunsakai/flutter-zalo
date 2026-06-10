@@ -1,6 +1,6 @@
 name: flutter_zalo
-description: "Flutter plugin for Zalo SDK"
-version: 1.0.0
+description: "A Flutter plugin for integrating Zalo SDK into your applications. Supports Zalo login, profile retrieval, and managing auth tokens on Android and iOS."
+version: 1.0.1
 homepage: https://github.com/zunsakai/flutter-zalo
 repository: https://github.com/zunsakai/flutter-zalo.git
 environment:

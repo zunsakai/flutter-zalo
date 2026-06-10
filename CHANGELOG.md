@@ -1,3 +1,8 @@
+## 1.0.1
+
+* Added fallback to WebView login flow when the Zalo app is not installed for both Android and iOS (`b5dec4e`).
+* Updated README with Android Maven repository setup instructions for the Zalo SDK (`b5dec4e`).
+
 ## 1.0.0
 
 * Pinned Android Zalo SDK dependencies to version `4.24.1101` and updated the Android build toolchain to AGP `9.0.1`, Kotlin `2.3.20`, and Java 17 (`8bc5111`, `764810b`).
