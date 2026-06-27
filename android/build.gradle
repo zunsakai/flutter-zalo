@@ -25,7 +25,11 @@ allprojects {
 }
 
 apply plugin: "com.android.library"
-apply plugin: "kotlin-android"
+
+def agpMajorVersion = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize(".")[0] as int
+if (agpMajorVersion < 9) {
+    plugins.apply("kotlin-android")
+}
 
 dependencies {
     def zalo_sdk_version = "4.24.1101"
@@ -47,10 +51,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17
     }
 
     sourceSets {
@@ -76,6 +76,14 @@ android {
                outputs.upToDateWhen {false}
                showStandardStreams = true
             }
+        }
+    }
+}
+
+plugins.withId("kotlin-android") {
+    kotlin {
+        compilerOptions {
+            jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
         }
     }
 }
