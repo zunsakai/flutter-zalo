@@ -1,6 +1,6 @@
-## Unreleased
+## 1.0.2
 
-* Migrated Android Gradle configuration toward Flutter built-in Kotlin while keeping compatibility with AGP versions earlier than 9.
+* Migrated Android Gradle configuration toward Flutter built-in Kotlin while keeping compatibility with AGP versions earlier than 9 (`e142a58`).
 
 ## 1.0.1
 
