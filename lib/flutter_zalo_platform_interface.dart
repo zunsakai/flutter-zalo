@@ -5,16 +5,8 @@ abstract class FlutterZaloAPI {
   /// Constructs a FlutterZaloAPI.
   FlutterZaloAPI();
 
-  static FlutterZaloAPI _instance = MethodChannelFlutterZalo();
-
   /// The default instance of [FlutterZaloAPI] to use.
-  static FlutterZaloAPI get instance => _instance;
-
-  /// Platform-specific plugins should set this with their own platform-specific
-  /// class that extends [FlutterZaloAPI] when they register themselves.
-  static set instance(FlutterZaloAPI instance) {
-    _instance = instance;
-  }
+  static FlutterZaloAPI instance = MethodChannelFlutterZalo();
 
   /// Initializes the plugin platform implementation.
   Future<void> init() {

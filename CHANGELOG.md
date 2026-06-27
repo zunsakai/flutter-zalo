@@ -1,3 +1,7 @@
+## 1.0.2
+
+* Migrated Android Gradle configuration toward Flutter built-in Kotlin while keeping compatibility with AGP versions earlier than 9 (`e142a58`).
+
 ## 1.0.1
 
 * Added fallback to WebView login flow when the Zalo app is not installed for both Android and iOS (`b5dec4e`).

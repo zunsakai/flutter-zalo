@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_zalo/flutter_zalo.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'Flutter Zalo',
       home: MyHomePage(title: 'Flutter Zalo'),
     );
@@ -14,16 +16,16 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
+  const MyHomePage({super.key, required this.title});
 
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  FlutterZalo flutterZalo = FlutterZalo();
+  final FlutterZalo flutterZalo = FlutterZalo();
 
   @override
   void initState() {
@@ -36,7 +38,6 @@ class _MyHomePageState extends State<MyHomePage> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(msg),
     ));
-    print(msg);
   }
 
   void logIn() async {

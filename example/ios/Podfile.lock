@@ -1,6 +1,6 @@
 PODS:
   - Flutter (1.0.0)
-  - flutter_zalo (1.0.1):
+  - flutter_zalo (1.0.2):
     - Flutter
     - ZaloSDK
   - ZaloSDK (4.1.0120):
