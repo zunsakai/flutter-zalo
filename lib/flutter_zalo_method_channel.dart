@@ -39,7 +39,8 @@ class MethodChannelFlutterZalo extends FlutterZaloAPI {
 
   @override
   Future<Map<String, dynamic>?> getProfile() async {
-    Map<Object?, Object?>? profile = await methodChannel.invokeMethod<Map<Object?, Object?>?>('getProfile');
+    Map<Object?, Object?>? profile =
+        await methodChannel.invokeMethod<Map<Object?, Object?>?>('getProfile');
     return profile?.cast<String, dynamic>();
   }
 
