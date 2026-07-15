@@ -40,6 +40,12 @@ Run this command:
 ```
 flutter pub add flutter_zalo
 ```
+
+## GitAds Sponsored
+Clicking the banner advertisement below will help fund the maintenance of this project. Thank you.
+[![Sponsored by GitAds](https://gitads.dev/v1/ad-serve?source=zunsakai/flutter-zalo@github)](https://gitads.dev/v1/ad-track?source=zunsakai/flutter-zalo@github)
+
+
 # 2. Setup
 ## 2.1 Create an application
 Go to this page: https://developers.zalo.me and create account/new app
